@@ -15,7 +15,11 @@ public class RacketMovement : MonoBehaviour
 	public float mouseXRotationRangeBottom = 5f;
 
 	public Vector2 mouseUpDownRange = new Vector2(-14f, -9f); // Define the range for forward and backward movement
-	public float RacketZRotationRange = 80f;
+	public float RacketZRotationRange = 90f;
+
+	public float mouseXRotationForYRange = 70f;
+	//public float mouseXRotationForYRangeBottom = 18f;
+	//public float RacketXRotationRange = 70f;
 
 
 	void Update()
@@ -34,10 +38,8 @@ public class RacketMovement : MonoBehaviour
 		// Move the racket left and right based on mouse X position
 		float mouseXRange = Map(worldPosition.z, mouseUpDownRange.x, mouseUpDownRange.y, mouseXRangeBottom, mouseXRangeTop);
 		float mouseXRotationRange = Map(worldPosition.z, mouseUpDownRange.x, mouseUpDownRange.y, mouseXRotationRangeBottom, mouseXRotationRangeTop);
-		float newX = Map(worldPosition.x, -mouseXRange, mouseXRange, -mouseXRangeTop, mouseXRangeTop);
-		//float newX = worldPosition.x;
+		float newX = Map(worldPosition.x, -mouseLeftRightRange, mouseLeftRightRange, -mouseXRange, mouseXRange);
 
-		Debug.Log("newX:" + newX + " worldX:" + worldPosition.x + " worldZ:" + worldPosition.z + " XRange:" + mouseXRange);
 
 		// Move the racket forward and backward based on mouse Y position
 		float newZ = Map(worldPosition.z, mouseUpDownRange.x, mouseUpDownRange.y, forwardBackwardRange.x, forwardBackwardRange.y);
@@ -46,7 +48,25 @@ public class RacketMovement : MonoBehaviour
 		transform.position = new Vector3(newX, transform.position.y, newZ);
 
 		// Make the racket look towards the mouse position
-		transform.rotation = Quaternion.Euler(0, 0, Map(newX, -mouseXRotationRange, mouseXRotationRange, RacketZRotationRange, -RacketZRotationRange));
+		float rotationZ = Map(newX, -mouseXRotationRange, mouseXRotationRange, RacketZRotationRange, -RacketZRotationRange);
+
+		float rotationY = 0;
+
+		if (Mathf.Abs(newX) > mouseXRangeBottom)
+		{
+			if (newX > 0)
+			{
+				rotationY = Map(newX, mouseXRangeBottom, mouseXRangeTop, 0f, -mouseXRotationForYRange);
+			}
+			else
+			{
+				rotationY = Map(newX, -mouseXRangeBottom, -mouseXRangeTop, 0f, mouseXRotationForYRange);
+			}
+		}
+
+		Debug.Log("newX:" + newX + " worldX:" + worldPosition.x + " worldZ:" + worldPosition.z + " XRange:" + mouseXRange + " rotationY:" + rotationY);
+
+		transform.rotation = Quaternion.Euler(0, rotationY, rotationZ);
 
 	}
 
